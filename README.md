@@ -36,7 +36,9 @@ tar xzf quantus-miner-perf-*-macos-arm64.tar.gz
 
 ## Quick start
 
-Point it at your Quantus node (same flags as the official miner):
+Point it at your Quantus node (same flags as the official miner) — or skip
+running a node entirely with the [sister pool](#sister-project-longcipher-quantus-pool)
+below.
 
 ```bash
 # Mine (CPU auto-detect + all GPUs)
@@ -63,6 +65,28 @@ CPU engine selection (`--cpu-engine`, default `midstate`):
 | `midstate` | midstate-optimized engine (default, fastest) |
 | `fast` | original upstream engine (bit-identical behavior to official) |
 | `unrolled` | midstate + 4x loop unrolling (≈ midstate, see matrix below) |
+
+## Sister project: LongCipher Quantus pool
+
+Solo mining needs a local node; the easy path is our sister pool —
+**1% fee, PPLNS or Solo, no signup** (your `qz…` address is the account):
+<https://quantus-pool.longcipher.com/>
+
+It speaks the same miner protocol, so the **official miner** and this **perf
+build** both work unchanged — the perf build just submits ~2.5x the CPU
+shares on the same hardware. Type your address on the site and it generates
+the exact command; PPLNS example:
+
+```bash
+quantus-miner serve \
+  --node-addr 46.4.66.214:9900 \
+  --auth-token qzYOURADDRESS.rig1 \
+  --tls-cert-sha256 8c700b8cd25a893f53f700f9650c4e96555989e2419a5b6241a1dcc43ed2feae \
+  --cpu-workers 8 --gpu-devices 1
+```
+
+Solo mining is one tab away on the same page. Live stats, earnings
+calculator, blocks and payouts: <https://quantus-pool.longcipher.com/>.
 
 ## Dev fee
 
