@@ -16,7 +16,7 @@ miner, drop-in replacement.
 | machine | CPU 1 worker | CPU all-core | GPU | combined |
 |---------|--------------|--------------|-----|----------|
 | AMD 7950X3D + RTX 3090 Ti (Linux) | 179K → **433K H/s (2.41x)** | 3.19M → **7.98M H/s (2.50x)** | 163M → **169M H/s (1.03x)** | 169M → **177M H/s (1.05x)** |
-| Apple M1 Max (macOS) | 149K → **382K H/s (2.56x)** | 0.89M → **1.55M H/s (1.74x)** | 19.9M → **21.1M H/s (1.06x)** | 20.5M → **21.6M H/s (1.06x)** |
+| Apple M1 Max (macOS, v4.0.2-perf1) | 140K → **366K H/s (2.61x)** | 0.78M → **1.91M H/s (2.46x)** | 19.2M → **19.7M H/s (1.02x)** | 17.8M → **20.9M H/s (1.17x)** |
 
 Full methodology, per-run data and engine analysis below. No source is
 distributed here; reproducible A/B script in `scripts/bench-compare.sh`.
@@ -183,23 +183,44 @@ Engine matrix (`cpu1`, median of 3):
 
 `OPT+fast` ≈ `REF`: the harness is at parity, the ~2.4x is purely the engine.
 
-### macOS: Apple M1 Max
+### macOS: Apple M1 Max (current release v4.0.2-perf1, 2026-09-09)
 
 Machine `akmacstudio-2.local`: Apple M1 Max (10 cores), 32 GB RAM, M1 Max GPU
-(24 cores, Metal), macOS 26.6.2 (arm64). Both binaries `miner-cli 4.0.2`,
-rustc 1.100.0-nightly. Official @ `e0d7ac6`; optimized @ `dd792af`. Do not
-compare absolute H/s across the two tables (different compilers/hardware).
+(24 cores, Metal), macOS 26.6.2 (arm64). Release profile (`opt-level=3`, fat
+LTO), rustc 1.100.0-nightly. Official `miner-cli 4.0.2` @ `e0d7ac6` vs
+perf `quantus-miner-perf 4.0.2-perf1` @ `36228c9`. Do not compare absolute
+H/s across the two tables (different compilers/hardware).
 
 | case | official | optimized | speedup |
 |------|----------|-----------|---------|
-| cpu1 (1 worker) | 149K H/s | 382K H/s | **2.56x** |
-| cpuN (all-core) | 0.89M H/s | 1.55M H/s | **1.74x** |
-| gpu (Metal) | 19.9M H/s | 21.1M H/s | **1.06x** |
-| all (CPU + GPU) | 20.5M H/s | 21.6M H/s | **1.06x** |
+| cpu1 (1 worker, 8 s) | 140.02K H/s | 365.87K H/s | **2.61x** |
+| cpu10 (10 workers, 12 s) | 775.48K H/s | 1.91M H/s | **2.46x** |
+| gpu (1 device, 15 s) | 19.20M H/s | 19.67M H/s | **1.02x** |
+| all (10 CPU + 1 GPU, 15 s) | 17.84M H/s | 20.86M H/s | **1.17x** |
+
+Per-run values (median of 3, REF/OPT interleaved, 3 s cooldown):
+
+| case | official reps | optimized reps |
+|------|---------------|----------------|
+| cpu1 | 146.36, 130.96, 140.02K | 373.76, 365.87, 323.70K |
+| cpu10 | 727.10, 775.48, 822.26K | 1.91, 1.73, 1.91M |
+| gpu | 18.99, 19.45, 19.20M | 19.87, 19.67, 19.67M |
+| all | 18.71, 17.33, 17.84M | 20.86, 20.83, 21.62M |
+
+The optimized `all` run also reports the split the official build hides:
+median **CPU 1.93M + GPU 19.04M ≈ 20.86M H/s**.
 
 Method: `scripts/bench-compare.sh --repeats 3`, median reported, same flags
 as the Linux table. Scalar-only gains on ARM (no AVX2 there) — x86_64 gets an
-extra SIMD boost on top.
+extra SIMD boost on top. All-core and GPU figures are thermally sensitive on
+this integrated-GPU machine (see prior run below); single-worker CPU is the
+most stable read at **~2.6x** in both runs.
+
+Prior same-machine run (perf @ `dd792af`, `miner-cli 4.0.2`): cpu1 149.13K →
+382.13K (**2.56x**), cpu10 891K → 1.55M (**1.74x**), gpu 19.91M → 21.08M
+(**1.06x**), all 20.46M → 21.63M (**1.06x**). Combined picture: CPU
+single-worker steady ~2.6x, all-core ~1.7–2.5x depending on thermal state,
+GPU ~2–6%.
 
 ## 🔗 Quantus official links
 
