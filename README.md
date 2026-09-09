@@ -1,7 +1,7 @@
 # ⚡ quantus-miner-perf — 2.5× Faster Quantus Miner, Drop-in Replacement
 
 [![Latest Release](https://img.shields.io/github/v/release/longcipher/quantus-miner-perf?style=flat-square)](https://github.com/longcipher/quantus-miner-perf/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue?style=flat-square)](#download)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue?style=flat-square)](#download)
 [![Quantus](https://img.shields.io/badge/powered_by-Quantus_Network-7c3aed?style=flat-square)](https://www.quantus.com/)
 
 > Same protocol as the official miner. Just faster.
@@ -29,16 +29,17 @@ Grab the latest release: <https://github.com/longcipher/quantus-miner-perf/relea
 |-------|----------|
 | `quantus-miner-perf-*-macos-arm64.tar.gz` | macOS Apple Silicon (M1/M2/…) |
 | `quantus-miner-perf-*-macos-x86_64.tar.gz` | macOS Intel |
+| `quantus-miner-perf-*-linux-x86_64.tar.gz` | Linux 64-bit (x86_64) |
 | `quantus-miner-perf-*-windows-x86_64.zip` | Windows 10/11 64-bit |
 
 ```bash
 # macOS Apple Silicon example (replace * with the release tag)
 tar xzf quantus-miner-perf-*-macos-arm64.tar.gz
-./quantus-miner benchmark --duration 10
+./quantus-miner-perf benchmark --duration 10
 ```
 
 > macOS Gatekeeper: unsigned binaries are blocked on first run. Right-click →
-> Open, or run `xattr -d com.apple.quarantine quantus-miner`.
+> Open, or run `xattr -d com.apple.quarantine quantus-miner-perf`.
 > Windows SmartScreen: click "More info" → "Run anyway" on first launch.
 
 ## Quick start
@@ -49,20 +50,20 @@ below.
 
 ```bash
 # Mine (CPU auto-detect + all GPUs)
-quantus-miner serve \
+quantus-miner-perf serve \
   --node-addr 127.0.0.1:9833 \
   --auth-token-file /path/to/miner-auth-token \
   --tls-cert-sha256-file /path/to/miner-tls-cert-sha256
 
 # CPU-only, 8 workers, midstate engine (default)
-quantus-miner serve --node-addr 127.0.0.1:9833 \
+quantus-miner-perf serve --node-addr 127.0.0.1:9833 \
   --auth-token-file /path/to/miner-auth-token \
   --tls-cert-sha256-file /path/to/miner-tls-cert-sha256 \
   --gpu-devices 0 --cpu-workers 8
 
 # Check your own throughput
-quantus-miner benchmark --duration 15
-quantus-miner benchmark --cpu-workers 0 --gpu-devices 1 --duration 15  # GPU only
+quantus-miner-perf benchmark --duration 15
+quantus-miner-perf benchmark --cpu-workers 0 --gpu-devices 1 --duration 15  # GPU only
 ```
 
 CPU engine selection (`--cpu-engine`, default `midstate`):
@@ -85,7 +86,7 @@ shares on the same hardware. Type your address on the site and it generates
 the exact command; PPLNS example:
 
 ```bash
-quantus-miner serve \
+quantus-miner-perf serve \
   --node-addr 46.4.66.214:9900 \
   --auth-token qzYOURADDRESS.rig1 \
   --tls-cert-sha256 8c700b8cd25a893f53f700f9650c4e96555989e2419a5b6241a1dcc43ed2feae \
