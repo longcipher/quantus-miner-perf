@@ -7,7 +7,7 @@
 [![Quantus](https://img.shields.io/badge/powered_by-Quantus_Network-7c3aed?style=flat-square)](https://www.quantus.com/)
 
 > Same protocol as the official miner. Just faster.
-> **CPU up to 2.6× · GPU up to 1.59× · split CPU/GPU reporting · lower host overhead.**
+> **CPU up to 2.6× · GPU up to 2.12× · split CPU/GPU reporting · lower host overhead.**
 
 > **Works with any pool, not just ours.** This build speaks the **official
 > Quantus miner protocol** — you can point it at **any pool that supports the
@@ -24,7 +24,7 @@ release `v4.0.2-perf1`):**
 
 | machine | CPU 1 worker | CPU all-core | GPU | combined |
 |---------|--------------|--------------|-----|----------|
-| AMD 7950X3D + RTX 3090 Ti (Linux) | 179K → **433K H/s (2.41x)** | 3.14M → **7.90M H/s (2.52x)** | 165M → **262M H/s (1.59x)** | 169M → **267M H/s (1.58x)** |
+| AMD 7950X3D + RTX 3090 Ti (Linux) | 179K → **432K H/s (2.41x)** | 3.15M → **7.94M H/s (2.52x)** | 164M → **347M H/s (2.12x)** | 170M → **352M H/s (2.08x)** |
 | Apple M1 Max (macOS, v4.0.2-perf1) | 140K → **366K H/s (2.61x)** | 0.78M → **1.91M H/s (2.46x)** | 19.2M → **19.7M H/s (1.02x)** | 17.8M → **20.9M H/s (1.17x)** |
 
 Full methodology, per-run data and engine analysis below. No source is
@@ -230,7 +230,7 @@ throughput.
 - **AVX2 four-wide Poseidon2 resume** on x86_64 (runtime-dispatched, scalar
   fallback on ARM — the Apple Silicon numbers above are scalar-only gains).
 - **Native CUDA backend** on NVIDIA: u32-limb Goldilocks kernels, per-arch
-  cubins and autotuned launch geometry — 164.54M → **262.05M H/s (1.59x)** on
+  cubins and   autotuned launch geometry — 163.88M → **347.45M H/s (2.12x)** on
   the RTX 3090 Ti. Other platforms (e.g. Metal on Apple Silicon) fall back to
   wgpu.
 - **Lower host/launch overhead**: amortized solution-flag polling, no unused
@@ -252,13 +252,13 @@ Official source: upstream `Quantus-Network/quantus-miner` @ `e0d7ac6`.
 
 | case | official | perf | speedup |
 |------|----------|------|---------|
-| CPU 1 worker | 179.26K H/s | 432.80K H/s | **2.41x** |
-| CPU 32 workers | 3.14M H/s | 7.90M H/s | **2.52x** |
-| GPU 1 device | 164.54M H/s | 262.05M H/s | **1.59x** |
-| combined (32 CPU + 1 GPU) | 169.05M H/s | 267.39M H/s | **1.58x** |
+| CPU 1 worker | 179.31K H/s | 431.65K H/s | **2.41x** |
+| CPU 32 workers | 3.15M H/s | 7.94M H/s | **2.52x** |
+| GPU 1 device | 163.88M H/s | 347.45M H/s | **2.12x** |
+| combined (32 CPU + 1 GPU) | 169.50M H/s | 352.40M H/s | **2.08x** |
 
-**CPU hashing is ~2.4–2.5x faster and GPU ~1.6x faster**, so the combined run
-gains **1.58x** instead of a few percent — unlike earlier releases, where the
+**CPU hashing is ~2.4–2.5x faster and GPU ~2.1x faster**, so the combined run
+gains **2.08x** instead of a few percent — unlike earlier releases, where the
 GPU was unchanged and dominated the total. The perf build also reports the
 CPU/GPU split that the official build hides.
 
