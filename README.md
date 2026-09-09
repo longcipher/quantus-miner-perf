@@ -115,33 +115,44 @@ Solo mining normally needs a local node; the easy path is our sister pool —
 Two ways to connect. Both are protocol-identical to the official miner — pick
 whichever you prefer.
 
+> **Mainland China users — use the relay.** The direct pool IP `46.4.66.214`
+> is blocked on the mainland, so a relay/proxy at **`57.180.173.214`** is
+> provided for you. Point there if you mine from China; overseas users can
+> connect directly to `46.4.66.214` (often faster). The TLS fingerprint is
+> identical on both, so nothing else changes.
+
 | | endpoint | PPLNS | Solo |
 |---|---|---|---|
-| `longpool` | built in | `--mode pplns` | `--mode solo` |
-| `serve` | manual | `46.4.66.214:9900` | `46.4.66.214:9901` |
+| `longpool` | built in (defaults to relay `57.180.173.214`) | `--mode pplns` | `--mode solo` |
+| `serve` | manual | `46.4.66.214:9900` (relay `57.180.173.214:9900`) | `46.4.66.214:9901` (relay `57.180.173.214:9901`) |
 
 ### Option 1 — `longpool` one-liner (recommended, zero config)
 
-Pool IP, port and TLS certificate fingerprint are **baked into the binary** —
-no endpoint to type, no fingerprint to copy. One command and you are mining.
+`longpool` **defaults to the relay `57.180.173.214`** (the IP is baked into the
+binary), so mainland miners can run the commands below as-is — no endpoint to
+type. Overseas users who prefer to connect directly pass
+`--pool-addr 46.4.66.214:9900` (PPLNS) or `46.4.66.214:9901` (Solo). The TLS
+fingerprint is the same on both, so you never copy it.
 
-**PPLNS** (default — earnings split by shares):
+**Mainland China — PPLNS** (via relay `57.180.173.214`, default — earnings split by shares):
 
 ```bash
 ./quantus-miner-perf longpool \
   --address qzYOURADDRESS \
   --worker rig1 \
   --mode pplns \
+  --pool-addr 57.180.173.214:9900 \
   --cpu-workers 8 --gpu-devices 1
 ```
 
-**Solo** (the finder takes the whole block minus the fee):
+**Mainland China — Solo** (via relay `57.180.173.214`; the finder takes the whole block minus the fee):
 
 ```bash
 ./quantus-miner-perf longpool \
   --address qzYOURADDRESS \
   --worker rig1 \
   --mode solo \
+  --pool-addr 57.180.173.214:9901 \
   --cpu-workers 8 --gpu-devices 1
 ```
 
@@ -149,6 +160,7 @@ no endpoint to type, no fingerprint to copy. One command and you are mining.
 |------|---------|
 | `--address` | your QTC payout address — it *is* your mining account, no registration |
 | `--worker` | optional rig label to tell machines apart; runs fine without it |
+| `--pool-addr` | pool endpoint `host:port`. Defaults to the relay `57.180.173.214` (mainland-friendly). Overseas users pass `46.4.66.214:9900` (PPLNS) / `46.4.66.214:9901` (Solo) to connect directly |
 
 Verified end-to-end against the public endpoint: the pool logs
 `miner connected … mode="pplns" remote=46.4.66.214:…` and shares came back
@@ -159,7 +171,11 @@ Verified end-to-end against the public endpoint: the pool logs
 Every connection parameter set by hand. Use this for custom setups, your own
 node, or **any other pool that speaks the official miner protocol**.
 
-**PPLNS:**
+`--node-addr` defaults to the direct endpoint `46.4.66.214` (overseas / faster).
+**Mainland China users: replace it with the relay `57.180.173.214`** — same ports
+9900/9901, same fingerprint.
+
+**PPLNS (direct — overseas):**
 
 ```bash
 ./quantus-miner-perf serve \
@@ -169,7 +185,18 @@ node, or **any other pool that speaks the official miner protocol**.
   --cpu-workers 8 --gpu-devices 1
 ```
 
-**Solo:** change the port to `9901`, everything else stays the same.
+**PPLNS (relay — mainland China):**
+
+```bash
+./quantus-miner-perf serve \
+  --node-addr 57.180.173.214:9900 \
+  --auth-token qzYOURADDRESS.rig1 \
+  --tls-cert-sha256 8c700b8cd25a893f53f700f9650c4e96555989e2419a5b6241a1dcc43ed2feae \
+  --cpu-workers 8 --gpu-devices 1
+```
+
+**Solo:** change the port to `9901`, everything else stays the same (direct
+`46.4.66.214:9901` or relay `57.180.173.214:9901`).
 
 ```bash
 ./quantus-miner-perf serve \
