@@ -1,4 +1,11 @@
-# quantus-miner-perf
+# ⚡ quantus-miner-perf — 2.5× Faster Quantus Miner, Drop-in Replacement
+
+[![Latest Release](https://img.shields.io/github/v/release/longcipher/quantus-miner-perf?style=flat-square)](https://github.com/longcipher/quantus-miner-perf/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue?style=flat-square)](#download)
+[![Quantus](https://img.shields.io/badge/powered_by-Quantus_Network-7c3aed?style=flat-square)](https://www.quantus.com/)
+
+> Same protocol as the official miner. Just faster.
+> **CPU up to 2.5× · GPU +3–6% · split CPU/GPU reporting · lower host overhead.**
 
 A high-performance Quantus external miner: midstate-optimized CPU engines, split
 CPU/GPU reporting, and lower GPU host overhead — same protocol as the official
@@ -157,5 +164,48 @@ Engine matrix (`cpu1`, median of 3):
 Machine `akmacstudio-2.local`: Apple M1 Max (10 cores), 32 GB RAM, M1 Max GPU
 (24 cores, Metal), macOS 26.6.2 (arm64). Both binaries `miner-cli 4.0.2`,
 rustc 1.100.0-nightly. Official @ `e0d7ac6`; optimized @ `dd792af`. Do not
-compare absolute H/s across the two tables (different compilers/har
-...[truncated 3070 chars]
+compare absolute H/s across the two tables (different compilers/hardware).
+
+| case | official | optimized | speedup |
+|------|----------|-----------|---------|
+| cpu1 (1 worker) | 149K H/s | 382K H/s | **2.56x** |
+| cpuN (all-core) | 0.89M H/s | 1.55M H/s | **1.74x** |
+| gpu (Metal) | 19.9M H/s | 21.1M H/s | **1.06x** |
+| all (CPU + GPU) | 20.5M H/s | 21.6M H/s | **1.06x** |
+
+Method: `scripts/bench-compare.sh --repeats 3`, median reported, same flags
+as the Linux table. Scalar-only gains on ARM (no AVX2 there) — x86_64 gets an
+extra SIMD boost on top.
+
+## 🔗 Quantus official links
+
+New to Quantus? Start here:
+
+| resource | link |
+|----------|------|
+| 🌐 Official site | <https://www.quantus.com/> |
+| 📖 Mining guide (docs) | <https://docs.quantus.com/guides/mining/> |
+| 📄 Whitepaper | <https://www.quantus.com/whitepaper/> |
+| ⛏️ Official miner (upstream) | <https://github.com/Quantus-Network/quantus-miner> |
+| 👛 CLI wallet | <https://github.com/Quantus-Network/quantus-cli> |
+| 🖥️ Node / chain | <https://github.com/Quantus-Network/chain> |
+| 🏢 GitHub org | <https://github.com/Quantus-Network> |
+| 🔍 Explorer (official) | <https://explorer.quantus.com/> |
+| 🔍 Explorer (blackbeard) | <https://blackbeard.observer/> |
+| 📡 Telemetry | <https://telemetry.quantus.cat/> |
+| 🐦 X / Twitter | <https://x.com/QuantusNetwork> |
+
+This repo is a community perf build — same miner protocol, just faster hashing.
+For consensus / wallet / network questions, the docs and repos above are
+authoritative.
+
+## 💬 Community — LongCipher miners
+
+Questions, hashrate screenshots, rig tuning? Come chat:
+
+- ✈️ Telegram: <https://t.me/longcipher>
+- 💬 WeChat: scan below to join the group
+
+<img src="assets/wechat_group.png" width="250" alt="LongCipher WeChat group QR code" />
+
+Solo or pool, official or perf build — all Quantus miners welcome.
