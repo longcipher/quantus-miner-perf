@@ -25,11 +25,34 @@ distributed here; reproducible A/B script in `scripts/bench-compare.sh`.
 
 Grab the latest release: <https://github.com/longcipher/quantus-miner-perf/releases/latest>
 
+### Install / upgrade (recommended)
+
+One-liner — detects OS/arch, picks the AVX2 (`-simd`) build on supported
+Linux CPUs, verifies `SHA256SUMS`, and skips reinstall when your local
+version is already ≥ the latest release:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/longcipher/quantus-miner-perf/master/scripts/install.sh | bash
+```
+
+```bash
+# custom dir / force reinstall / pin a version
+curl -fsSL https://raw.githubusercontent.com/longcipher/quantus-miner-perf/master/scripts/install.sh | bash -s -- --dir ~/.local/bin
+curl -fsSL https://raw.githubusercontent.com/longcipher/quantus-miner-perf/master/scripts/install.sh | bash -s -- --force
+curl -fsSL https://raw.githubusercontent.com/longcipher/quantus-miner-perf/master/scripts/install.sh | bash -s -- --tag v4.0.2-perf1
+```
+
+> Version check is `release tag vX` ≡ `quantus-miner-perf -V → … X`
+> (script updates only when the release is newer than local).
+
+### Manual download
+
 | asset | platform |
 |-------|----------|
 | `quantus-miner-perf-*-macos-arm64.tar.gz` | macOS Apple Silicon (M1/M2/…) |
 | `quantus-miner-perf-*-macos-x86_64.tar.gz` | macOS Intel |
 | `quantus-miner-perf-*-linux-x86_64.tar.gz` | Linux 64-bit (x86_64) |
+| `quantus-miner-perf-*-linux-x86_64-simd.tar.gz` | Linux 64-bit with AVX2 (auto-picked by install.sh) |
 | `quantus-miner-perf-*-windows-x86_64.zip` | Windows 10/11 64-bit |
 
 ```bash
