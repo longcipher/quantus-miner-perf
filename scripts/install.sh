@@ -9,6 +9,7 @@
 #   3. Compares latest release tag against `quantus-miner-perf -V`;
 #      skips install when local is already >= latest (unless --force).
 #   4. Verifies SHA256SUMS before installing.
+#   5. Installs atomically (stage + rename) and verifies the binary runs.
 #
 # Options:
 #   --dir DIR        install dir (default: /usr/local/bin)
@@ -135,8 +136,27 @@ done
 
 DST="$DIR/$BIN"; case "$SRC" in *.exe) DST="$DST.exe";; esac # ponytail: always install as quantus-miner-perf
 mkdir -p "$DIR" || die "cannot create $DIR"
-if [ -w "$DIR" ]; then cp "$SRC" "$DST" && chmod 755 "$DST"
-else echo "no write access to $DIR, retrying with sudo..."
-  sudo cp "$SRC" "$DST" && sudo chmod 755 "$DST" || die "install failed; try --dir ~/.local/bin"
+# Stage then rename, never cp over the live path: overwriting a running
+# binary in place tears its text pages and macOS SIGKILLs the next exec
+# (kernel: "rejecting invalid page ... tainted", shell reports "killed"
+# with zero program output). rename(2) is atomic: live processes keep the
+# old inode, new execs always see a complete file.
+STAGE="$TMP/stage-$BIN"
+cp "$SRC" "$STAGE" && chmod 755 "$STAGE" || die "staging failed"
+if [ "$(uname -s)" = "Darwin" ]; then
+  # Best-effort Gatekeeper healing: drop any quarantine flag however it got
+  # there, and ensure an ad-hoc signature exists (unsigned/stale-signed
+  # binaries are SIGKILLed at exec with no output).
+  xattr -d com.apple.quarantine "$STAGE" 2>/dev/null || true
+  if command -v codesign >/dev/null 2>&1 && ! codesign --verify "$STAGE" 2>/dev/null; then
+    codesign --force -s - "$STAGE" 2>/dev/null || true
+  fi
 fi
-echo "installed: $("$DST" -V 2>&1 | head -1) -> $DST"
+if [ -w "$DIR" ]; then mv -f "$STAGE" "$DST"
+else echo "no write access to $DIR, retrying with sudo..."
+  sudo mv -f "$STAGE" "$DST" || die "install failed; try --dir ~/.local/bin"
+fi
+# Fail closed: a binary the kernel would SIGKILL prints nothing here.
+VER_OUT="$("$DST" -V 2>&1 | head -1)"
+[ -n "$VER_OUT" ] || die "installed binary fails to run ($DST -V produced no output; macOS may have blocked it — try: xattr -d com.apple.quarantine $DST)"
+echo "installed: $VER_OUT -> $DST"
